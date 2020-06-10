@@ -26,6 +26,7 @@ class SpaceShip():
 
     def update(self):
         if self.moving_right and self.rect.right < self.screen_rect.right:
+            
             self.rect.centerx += self.cats_invasion_settings.spaceship_speed_factor
             #print(self.rect.centerx)
         elif self.moving_left and self.rect.left > 0:
