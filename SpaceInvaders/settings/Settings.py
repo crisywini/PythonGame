@@ -11,6 +11,6 @@ class Settings():
         '''
         Init method of Settings
         '''
-        self.screen_width = 1200
-        self.screen_height = 800
+        self.screen_width = 700
+        self.screen_height = 700
         self.background_color = (230, 230, 230)
