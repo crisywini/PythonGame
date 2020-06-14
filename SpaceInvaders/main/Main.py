@@ -25,7 +25,8 @@ def run_game():
     while True:
         functions.check_events(spaceship, screen, cats_invasion_settings, bullets)
         spaceship.update()
-        functions.update_bullets(bullets)
+        functions.update_bullets(bullets, aliens_cat, cats_invasion_settings, screen, spaceship)
+        functions.update_cat_aliens(cats_invasion_settings,aliens_cat, spaceship)
         
         functions.update_screen(cats_invasion_settings, screen, spaceship, aliens_cat, bullets)
 

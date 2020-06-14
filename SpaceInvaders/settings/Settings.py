@@ -24,3 +24,8 @@ class Settings():
         self.bullet_width = 7
         self.bullet_height = 20
         self.bullet_color = 60, 60, 60
+        
+        self.alien_cat_speed_factor = 1
+        self.fleet_drop_speed = 10
+        #Fleet direction 1 -> right -1 -> left
+        self.fleet_direction = 1
