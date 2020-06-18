@@ -16,3 +16,15 @@ def play_shot():
 def play_cat_mad():
     cat = pygame.mixer.Sound('../resources/sounds/catMad.wav')
     cat.play()
+def play_spaceship_explosion():
+    explosion = pygame.mixer.Sound('../resources/sounds/spaceShipExplosion.wav')
+    explosion.play()
+    
+def play_soundtrack():
+    soundtrack = pygame.mixer.Sound('../resources/sounds/fondoCats2.wav')
+    soundtrack.play(1)
+    
+    
+    
+    
+    

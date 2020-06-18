@@ -39,3 +39,27 @@ class SpaceShip():
         Pygame method blit() to draw the image.
         '''
         self.screen.blit(self.image, self.rect)
+    def center_ship(self):
+        '''
+        Put the spaceship on the center
+        '''
+        self.center = self.screen_rect.centerx
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    

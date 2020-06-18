@@ -9,6 +9,8 @@ from elements.Bullet import Bullet
 from elements.AlienCat import AlienCat
 from elements.Sounds import play_shot
 from elements.Sounds import play_cat_mad
+from elements.Sounds import play_spaceship_explosion
+from time import sleep
 
 
 def check_keydown_events(event, spaceship, screen, cats_invasion_settings, bullets):
@@ -30,7 +32,7 @@ def check_keyup_events(event, spaceship):
         spaceship.moving_left = False
 
 
-def check_events(spaceship, screen, cats_invasion_settings, bullets):
+def check_events(spaceship, screen, cats_invasion_settings, bullets, stats, play_button, aliens_cat):
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
             sys.exit()
@@ -38,6 +40,9 @@ def check_events(spaceship, screen, cats_invasion_settings, bullets):
             check_keydown_events(event, spaceship, screen, cats_invasion_settings, bullets)
         elif event.type == pygame.KEYUP:
             check_keyup_events(event, spaceship)
+        elif event.type == pygame.MOUSEBUTTONDOWN:
+            mouse_x, mouse_y = pygame.mouse.get_pos()
+            check_play_buttons(stats, play_button, mouse_x, mouse_y, spaceship, aliens_cat, bullets,cats_invasion_settings, screen)
 
 
 def get_number_aliens_cats_x(cats_invasion_settings, alien_cat_width):
@@ -53,13 +58,18 @@ def create_alien(cats_invasion_settings, screen, aliens_cat, aliens_cat_number, 
     alien.rect.x = alien.x
     alien.rect.y = alien.rect.height + 2 * alien.rect.height * row_number
     aliens_cat.add(alien)
+
+
 def check_bullet_cats_collisions(bullets, aliens_cat, cats_invasion_settings, screen, spaceship):
     collisions = pygame.sprite.groupcollide(bullets, aliens_cat, True, True)
     if(collisions):
         play_cat_mad()
     if len(aliens_cat) == 0:
         bullets.empty()
+        cats_invasion_settings.increase_speed()
         create_fleet(cats_invasion_settings, screen, spaceship, aliens_cat)
+
+
 def update_bullets(bullets, aliens_cat, cats_invasion_settings, screen, spaceship):
     bullets.update()
     for bullet in bullets.copy():
@@ -88,7 +98,7 @@ def create_fleet(cats_invasion_settings, screen, spaceship, aliens_cat):
             create_alien(cats_invasion_settings, screen, aliens_cat, alien, row)
 
 
-def update_screen(cats_invasion_settings, screen, spaceship, aliens_cat, bullets):
+def update_screen(cats_invasion_settings, screen, spaceship, aliens_cat, bullets, stats, play_button):
     screen.fill(cats_invasion_settings.background_color)
 
     for bullet in bullets.sprites():
@@ -96,15 +106,21 @@ def update_screen(cats_invasion_settings, screen, spaceship, aliens_cat, bullets
     spaceship.blitme() 
     aliens_cat.draw(screen)
     # alien_cat.blitme()
+    if not stats.game_active:
+        play_button.draw_button()
+    
+    
     
     pygame.display.flip()  # muestra lo ultimo dibujado en pantalla
 
 
-def update_cat_aliens(cats_invasion_settings, cat_aliens, spaceship):
+def update_cat_aliens(cats_invasion_settings, stats, cat_aliens, spaceship, screen, bullets):
     check_fleet_edges(cats_invasion_settings, cat_aliens)
     cat_aliens.update()
     if pygame.sprite.spritecollideany(spaceship, cat_aliens):
-        print('Ship hit')
+        ship_hit(cats_invasion_settings, screen, stats, cat_aliens, bullets, spaceship)
+    
+    check_aliens_bottom(cats_invasion_settings, screen, stats, cat_aliens, bullets, spaceship)
 
     
 def change_fleet_direction(cats_invasion_settings, aliens_cat):
@@ -118,3 +134,47 @@ def check_fleet_edges(cats_invasion_settings, aliens_cat):
         if alien.check_edges():
             change_fleet_direction(cats_invasion_settings, aliens_cat)
             break
+
+
+def ship_hit(cats_invasion_settings, screen, stats, cat_aliens, bullets, spaceship):
+    if stats.ships_left>0:
+        stats.ships_left -= 1
+        cat_aliens.empty()
+        bullets.empty()
+        
+        create_fleet(cats_invasion_settings, screen, spaceship, cat_aliens)
+        spaceship.center_ship()
+        play_spaceship_explosion()
+        sleep(3)
+    else:
+        stats.game_active = False
+        pygame.mouse.set_visible(True)
+    
+def check_aliens_bottom(cats_invasion_settings, screen, stats, cat_aliens, bullets, spaceship):
+    
+    screen_rect = screen.get_rect()
+    for alien in cat_aliens.sprites():
+        if alien.rect.bottom >= screen_rect.bottom:
+            ship_hit(cats_invasion_settings, screen, stats, cat_aliens, bullets, spaceship)
+            break
+def check_play_buttons(stats, play_button, mouse_x, mouse_y, spaceship, aliens_cat, bullets,cats_invasion_settings, screen):
+    button_clicked =play_button.rect.collidepoint(mouse_x, mouse_y) 
+    if button_clicked and not stats.game_active:
+        cats_invasion_settings.initialize_dynamic_settings()
+        pygame.mouse.set_visible(False)
+        stats.reset_stats()
+        stats.game_active = True
+    
+        aliens_cat.empty()
+        bullets.empty()
+        
+        create_fleet(cats_invasion_settings, screen, spaceship, aliens_cat)
+    
+        spaceship.center_ship()
+    
+    
+    
+    
+    
+    
+    
